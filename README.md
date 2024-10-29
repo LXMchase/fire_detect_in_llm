@@ -24,5 +24,6 @@ scikit-learn>=0.24,<1.0
 # run:
 fire_detect/：
 daphne fire_detect.asgi:application
+
 frontend/:
 npm run serve
