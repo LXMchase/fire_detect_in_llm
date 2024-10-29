@@ -1,11 +1,9 @@
+# environment： 
 conda create --name myenv python=3.10.9  
 conda activate myenv  
 conda install -c conda-forge nodejs  
-# 验证 Node.js 和 npm 是否安装成功：  
 node -v  
-npm -v
-# environment：  
-设置淘宝镜像：  
+npm -v  
 npm config set registry https://registry.npmmirror.com  
 npm install -g @vue/cli  
 npm install axios
