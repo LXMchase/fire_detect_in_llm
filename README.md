@@ -19,6 +19,8 @@ opencv-python>=4.5,<5.0
 numpy>=1.19,<2.0  
 scikit-image>=0.18,<1.0  
 scikit-learn>=0.24,<1.0
+# llm-secret
+fire_detect/chat/consumers.py 这个文件中的qwen-plus密钥sk-xxx需要替换为实际密钥
 # run  
 fire_detect/：  
 daphne fire_detect.asgi:application  
