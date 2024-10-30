@@ -12,6 +12,7 @@ django>=3.0,<4.0
 djangorestframework>=3.12,<4.0  
 django-cors-headers  
 daphne  
+opencv-python  
 Pillow>=8.0,<9.0  
 channels>=3.0,<4.0  
 dashscope>=1.0,<2.0  
