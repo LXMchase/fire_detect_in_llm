@@ -138,7 +138,7 @@ export default {
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 80vh;
+  height: 90vh;
   border: 1px solid #ccc;
   border-radius: 10px;
   padding: 10px;
@@ -199,7 +199,7 @@ export default {
 }
 
 .file-content {
-  max-width: 300px; /* 设置最大宽度 */
+  max-width: 400px; /* 设置最大宽度 */
   max-height: 500px; /* 设置最大高度 */
   object-fit: cover; /* 保持宽高比 */
 }

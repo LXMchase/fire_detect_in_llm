@@ -82,13 +82,7 @@ def process_image_otsu(image_path, histogram_folder='', width=50):
 
     # 将提取的区域转换为三维数组
     extracted_region_colored = cv2.cvtColor(extracted_region, cv2.COLOR_GRAY2BGR)
-
     # 水平堆叠
-    combined_image = np.hstack((extracted_region_colored, output_image))
-    # 定义保存路径
-    combined_image_path = os.path.join('../../media', 'combined_image.png')
-
-    # 保存合成图像
-    combined_image.save(combined_image_path)
+    combined_image = np.vstack((extracted_region_colored, output_image))
     return combined_image
 

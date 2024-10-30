@@ -2,9 +2,7 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 import json
 from http import HTTPStatus
 from dashscope import Generation  # 确保已安装 dashscope
-import base64
-from io import BytesIO
-
+import cv2
 from django.conf import settings
 import sys
 import os
@@ -71,13 +69,22 @@ class MessageConsumer(AsyncWebsocketConsumer):
             # 直接使用传入的 image_url，假设它是相对于 MEDIA_URL 的路径
             # 获取文件名
             image_name = os.path.basename(image_url)
-
             # 构建完整的文件路径
             processed_image_path = os.path.join(settings.MEDIA_ROOT, image_name)
             print("Processing image", processed_image_path)
             # 检查文件是否存在
             if not os.path.exists(processed_image_path):
                 return "Image not found."
+
+            # 调用 process_image_otsu 函数处理图像
+            processed_image = process_image_otsu(processed_image_path, histogram_folder='', width=50)
+            # 获取源文件的扩展名
+            _, ext = os.path.splitext(image_name)
+            processed_image_name = f"{os.path.splitext(image_name)[0]}_processed{ext}"  # 保持原扩展名
+            processed_image_path = os.path.join(settings.MEDIA_ROOT, processed_image_name)
+
+            # 使用 OpenCV 保存处理后的图像
+            cv2.imwrite(processed_image_path, processed_image)
 
             # 手动构建绝对路径
             # 获取主机信息
@@ -89,7 +96,7 @@ class MessageConsumer(AsyncWebsocketConsumer):
             if port == 443:
                 protocol = 'https'
 
-            file_url = f"{protocol}://{host}:{port}/media/{image_name}"
+            file_url = f"{protocol}://{host}:{port}/media/{processed_image_name}"
 
             # file_url = '/media/' + image_name
             print("file_url", file_url)

@@ -3,13 +3,10 @@ from .models import Message
 from .serializers import MessageSerializer
 from rest_framework.decorators import api_view
 import base64
-from django.core.files.storage import default_storage
 from rest_framework.response import Response
-import os,sys
-from django.conf import settings
+import os
 from PIL import Image
 import io
-
 class MessageViewSet(viewsets.ModelViewSet):
     queryset = Message.objects.all().order_by('-timestamp')
     serializer_class = MessageSerializer
@@ -28,7 +25,7 @@ def upload_file(request):
             image = Image.open(io.BytesIO(image_data))
 
             # 处理图像（如缩放、保存等）
-            processed_image_path = 'media/processed_image.' + ext
+            processed_image_path = 'media/temp_image.' + ext
             image.save(processed_image_path)
 
             # 返回处理后的图像 URL
