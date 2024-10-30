@@ -29,6 +29,9 @@ class MessageConsumer(AsyncWebsocketConsumer):
         elif message_type == 'image':
             print("######", content)
             response_message = await self.handle_image_upload(content)
+        elif message_type == 'video':
+            print("###### Video Content:", content)
+            response_message = await self.handle_video_upload(content)  # 新增的视频处理逻辑
         else:
             response_message = "Unknown message type."
 
@@ -38,6 +41,15 @@ class MessageConsumer(AsyncWebsocketConsumer):
             'type': message_type  # 可以传回消息类型
         }))
 
+    def build_file_url(self, file_name):
+        # 构建文件的绝对 URL
+        host = 'localhost'  # 客户端 IP 地址
+        port = 8000  # 客户端端口
+        protocol = 'http'  # 可以根据需要选择 'http' 或 'https'
+        if port == 443:
+            protocol = 'https'
+
+        return f"{protocol}://{host}:{port}/media/{file_name}"
     async def handle_text_message(self, content):
         try:
             # 调用 Generation 来处理文本消息
@@ -85,23 +97,31 @@ class MessageConsumer(AsyncWebsocketConsumer):
 
             # 使用 OpenCV 保存处理后的图像
             cv2.imwrite(processed_image_path, processed_image)
-
-            # 手动构建绝对路径
-            # 获取主机信息
-            host = 'localhost'  # 客户端 IP 地址
-            port = 8000  # 客户端端口
-
             # 构建 URL
-            protocol = 'http'  # 可以根据您的应用选择 'http' 或 'https'
-            if port == 443:
-                protocol = 'https'
-
-            file_url = f"{protocol}://{host}:{port}/media/{processed_image_name}"
-
-            # file_url = '/media/' + image_name
+            file_url = self.build_file_url(processed_image_name)
             print("file_url", file_url)
             return file_url
 
         except Exception as e:
             print("Error processing image:", str(e))
             return "Error processing image."
+
+    async def handle_video_upload(self, video_url):
+        try:
+            # 获取文件名
+            video_name = os.path.basename(video_url)
+            processed_video_path = os.path.join(settings.MEDIA_ROOT, video_name)
+            print("Processing video", processed_video_path)
+
+            # 检查文件是否存在
+            if not os.path.exists(processed_video_path):
+                return "Video not found."
+
+            # 这里可以添加视频处理逻辑，例如提取缩略图等
+            # 例如，假设我们只返回视频的 URL
+            file_url = self.build_file_url(video_name)
+            return file_url
+
+        except Exception as e:
+            print("Error processing video:", e)
+            return "Error processing video."

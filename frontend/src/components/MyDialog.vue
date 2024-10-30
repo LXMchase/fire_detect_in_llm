@@ -8,6 +8,14 @@
         :class="{ 'user-message': msg.username === username, 'server-message': msg.username === 'Server' }">
         <span v-if="msg.type === 'text'" class="content">{{ msg.content }}</span>
         <img v-if="msg.type === 'image'" :src="msg.content" alt="Processed Image" class="file-content" />
+        <video
+          v-if="msg.type === 'video'"
+          :src="msg.content"
+          controls
+          class="file-content"
+          style="max-width: 400px; max-height: 300px; margin-top: 5px;">
+          Your browser does not support HTML5 video.
+        </video>
       </div>
     </div>
     <div class="input-container">
@@ -83,9 +91,9 @@ export default {
       const file = event.target.files[0];
       if (file) {
         // 文件类型检查
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'video/mp4'];
         if (!allowedTypes.includes(file.type)) {
-          alert("Please upload a valid image file (JPEG/PNG/GIF).");
+          alert("Please upload a valid image or video file (JPEG/PNG/GIF/MP4).");
           return;
         }
 
@@ -93,9 +101,16 @@ export default {
 
         // 当文件读取完成后
         reader.onloadend = () => {
-          const base64Image = reader.result; // 获取 Base64 编码的图像
+          const base64File = reader.result; // 获取 Base64 编码的文件
+          // 根据文件类型决定发送哪个字段
+          const data = {};
+          if (file.type.startsWith('image/')) {
+            data.base64_image = base64File; // 只发送图像
+          } else if (file.type.startsWith('video/')) {
+            data.base64_video = base64File; // 只发送视频
+          }
           // 使用 Axios 上传 Base64 字符串
-          axios.post('http://localhost:8000/api/upload/', { base64_image: base64Image }, {
+          axios.post('http://localhost:8000/api/upload/', data, {
             headers: {
               'Content-Type': 'application/json' // 发送 JSON 数据
             }
@@ -103,14 +118,13 @@ export default {
           .then(response => {
             console.log('File uploaded:', response.data);
             const processedImageUrl = response.data.fileUrl; // 确保后端返回处理后的图像 URL
-            //this.displayImage(processedImageUrl, 'Processed Image', false); // false表示服务端的消息 显示处理后的图像
 
             // 构造 WebSocket 消息
             const fileMessage = {
               username: this.username,
               content: processedImageUrl, // 返回的文件 URL
               timestamp: Date.now(),
-              type: 'image' // 添加类型标识
+              type: file.type.startsWith('video/') ? 'video' : 'image'  // 添加类型标识
             };
 
             // 将文件消息添加到本地消息列表
