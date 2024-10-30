@@ -49,7 +49,7 @@ class MessageConsumer(AsyncWebsocketConsumer):
                 result_format='message',
                 stream=True,
                 incremental_output=True,
-                api_key="sk-CUPyz5jlFA"  # 替换为您的 API 密钥
+                api_key="sk-xxx"  # 替换为您的 API 密钥
             )
 
             # 处理响应并返回结果
